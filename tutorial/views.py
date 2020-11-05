@@ -3,51 +3,11 @@ from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import permissions, status
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from .models import Tutorial
-from .serializers import TutorialSerializer, MyTokenObtainPairSerializer, CustomUserSerializer
+from .serializers import TutorialSerializer
 # Create your views here.
-
-
-class ObtainTokenPairWithColorView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
-
-class CustomUserCreate(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = ()
-
-    def post(self, request, format='json'):
-        serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            if user:
-                json = serializer.data
-                return Response(json, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class HomeView(APIView):
-    
-    def get(self, request):
-        return Response(data={"Hello":"World"}, status=status.HTTP_200_OK)
-
-
-class LogoutAndBlacklist(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = ()
-
-    def post(self, request):
-        try:
-            refresh_token = request.data["refresh_token"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response(status=status.HTTP_205_RESET_CONTENT)
-        except Exception as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -82,7 +42,7 @@ def tutorial_detail(request, pk):
     except Tutorial.DoesNotExist:
         return JsonResponse({"message": "The tutorial does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == "GET" and request.user.is_authenticated:
+    if request.method == "GET":
         tutorial_serializer = TutorialSerializer(tutorial)
         return JsonResponse(tutorial_serializer.data)
     

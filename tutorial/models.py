@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
@@ -12,5 +11,3 @@ class Tutorial(models.Model):
         return self.title 
 
 
-class CustomUser(AbstractUser):
-    fav_color = models.CharField(max_length=120)
